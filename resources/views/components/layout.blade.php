@@ -22,9 +22,21 @@
                 <a href="#">Categories</a>
             </div>
 
-            <div>
-                <a href="#">Login</a>
-            </div>
+            @guest
+                <div class="space-x-3 font-bold">
+                    <a href="{{ route('register') }}">Register</a>
+                    <a href="{{ route('login') }}">Login</a>
+                </div>
+            @endguest
+
+            @auth
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    
+                    <button>Log out</button>
+                </form>              
+            @endauth
         </nav>
 
         <div class="mx-auto max-w-5xl">
