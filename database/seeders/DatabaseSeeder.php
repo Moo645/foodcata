@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Restaurant::factory(3)->create();
-        Category::factory(4)->create();
+        $category = Category::factory(4)->create();
+        Restaurant::factory(3)->hasAttached($category)->create();
         Dish::factory(20)->create();
 
     }
