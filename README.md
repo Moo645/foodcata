@@ -1,66 +1,88 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Foodcata
+## 簡介
+這是一個使用 Laravel 11 構建的專案，
+旨在熟悉新版本框架與展示我對 Laravel 的編寫的慣例。
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+專案包括使用 Queue Jobs、Observers 和 Policies 等技術，展示了如何利用 Laravel 的功能來構建一個具有可讀性、可維護的應用程序。
 
-## About Laravel
+## 主頁面
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 預覽圖
+使用 Blade 製作可複用的 Components 配合 TailWindCSS 
+#### 主畫面預覽圖：
+![主頁面 1](storage/framework/readme/home_1.png)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 餐廳列表預覽圖：
+![餐廳列表](storage/framework/readme/restaurant.png)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Stacks
+- Laravel 11: 最新版本 (2024/03 釋出)。
 
-## Learning Laravel
+- Queue Jobs: 用於處理排隊任務，提升應用程序的性能和響應速度。 (目前使用DB)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Observers: 用於監聽 Controller，實現自動化處理邏輯。
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- Policies: 用於封裝授權邏輯，控制用戶對資源的訪問權限。
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Redis: 用於Queue Jobs的後端服務。(尚未實裝)
 
-## Laravel Sponsors
+## 主要功能
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- 餐廳管理
+    - 使用者可以添加、編輯和刪除餐廳。
 
-### Premium Partners
+- 排程工作
+    - 當新餐廳 Create 時，系統會自動排隊一個作業來處理後續任務，如發送通知等。
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- Observers
+    - 當餐廳創建時，使用 Observer 自動dispatch Job 處理相關邏輯。
 
-## Contributing
+- Policies
+    - 使用 Policies 控制用戶對餐廳的操作權限，僅允許餐廳擁有者進行編輯和刪除操作。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 技術細節
+### 使用 Queue Jobs
 
-## Code of Conduct
+使用了 Laravel 的隊列功能來處理較耗時的作業，避免使用者等待 Respond 太久。
+RestaurantCreatedLogging 負責在餐廳創建後執行後續處理工作，如日誌紀錄。
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```php
+// app/Jobs/RestaurantCreatedLogging.php
 
-## Security Vulnerabilities
+public function handle(): void
+{
+    // 模擬較慢的工作
+    sleep(5);
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    // 處理完後, 在專門的 log 中留下處理結果
+    Log::channel('restaurant_jobs')->info('Processing Restaurant Created', [
+        'restaurant_id' => $this->restaurant->id,
+        'restaurant_name' => $this->restaurant->name,
+        'restaurant_user_id' => $this->restaurant->user_id,
+    ]);
+}
+```
 
-## License
+### 使用 Observers
+使用 Observers 監聽 Controller ，當餐廳創建時 Observer 會 Dispatch job，讓 Controller 能更專注在本身職責。
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```php
+// app/Observers/RestaurantObserver.php
+
+class RestaurantObserver
+{
+    public function created(Restaurant $restaurant)
+    {
+        RestaurantCreatedLogging::dispatch($restaurant);
+    }
+
+}
+```
+
+
+### Foodcata 版本
++ 0.0.1
+    + 增加Restautrant 模組
+
+### 聯繫方式
+Email: wells.liu645@gmail.com

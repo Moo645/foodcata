@@ -13,7 +13,7 @@
         <nav class="flex justify-between items-center py-4 border-b border-white/20">
             <div>
                 <a href="/">
-                    <img src="https://fakeimg.pl/50x50/" alt="">
+                    <img src="https://fakeimg.pl/50x50/?text=LOGO" alt="">
                 </a>
             </div>
 
