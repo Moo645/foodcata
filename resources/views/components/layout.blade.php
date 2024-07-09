@@ -12,14 +12,14 @@
     <div class="px-10">
         <nav class="flex justify-between items-center py-4 border-b border-white/20">
             <div>
-                <a href="#">
+                <a href="/">
                     <img src="https://fakeimg.pl/50x50/" alt="">
                 </a>
             </div>
 
             <div class="space-x-6 font-bold">
-                <a href="#">Restaurants</a>
-                <a href="#">Categories</a>
+                <a href="{{ route('restaurants.index') }}">管理餐廳</a>
+                <a href="#">線上訂餐</a>
             </div>
 
             @guest

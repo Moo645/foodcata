@@ -3,10 +3,18 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RestaurantController;
+use App\Models\Category;
+use App\Models\Restaurant;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $restaurants = Restaurant::with(['categories'])->get();
+    $categories = Category::all();
+    return view('welcome', [
+        'restaurants' => $restaurants,
+        'categories' => $categories
+    ]);
 });
 
 Route::middleware('guest')->group(function () {
@@ -20,3 +28,5 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::delete('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
+
+Route::resource('restaurants', RestaurantController::class);

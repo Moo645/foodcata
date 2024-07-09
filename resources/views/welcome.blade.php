@@ -10,19 +10,9 @@
 
             <div class="mt-5 flex flex-wrap justify-start">
 
-                <x-category-card>義大利麵</x-category-card>
-                <x-category-card>水餃</x-category-card>
-                <x-category-card>珍珠奶茶</x-category-card>
-                <x-category-card>義大利麵</x-category-card>
-                <x-category-card>水餃</x-category-card>
-                <x-category-card>珍珠奶茶</x-category-card>
-                <x-category-card>義大利麵</x-category-card>
-                <x-category-card>水餃</x-category-card>
-                <x-category-card>珍珠奶茶</x-category-card>
-                <x-category-card>義大利麵</x-category-card>
-                <x-category-card>水餃</x-category-card>
-                <x-category-card>珍珠奶茶</x-category-card>
-                
+                @foreach ($categories as $category)
+                    <x-category-card>{{ $category->name }}</x-category-card>
+                @endforeach
             </div>
         </div>
 
@@ -32,11 +22,9 @@
 
             <div class="mt-5 flex flex-wrap justify-start">
 
-                <x-restaurant-card></x-restaurant-card>
-                <x-restaurant-card></x-restaurant-card>
-                <x-restaurant-card></x-restaurant-card>
-                <x-restaurant-card></x-restaurant-card>
-                <x-restaurant-card></x-restaurant-card>
+                @foreach ($restaurants as $restaurant )
+                    <x-restaurant-card :$restaurant></x-restaurant-card>
+                @endforeach
                 
             </div>
         </div>
