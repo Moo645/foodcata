@@ -6,6 +6,7 @@ use App\Models\Restaurant;
 use App\Http\Requests\StoreRestaurantRequest;
 use App\Http\Requests\UpdateRestaurantRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class RestaurantController extends Controller
 {
@@ -38,6 +39,7 @@ class RestaurantController extends Controller
     {
 
         $validatedData = $request->validated();
+        
         $user_id = Auth::id();
 
         Restaurant::create([
@@ -54,8 +56,10 @@ class RestaurantController extends Controller
      */
     public function show(Restaurant $restaurant)
     {
-        $isOwner = $restaurant->isOwner(auth()->user());
-        
+        $isOwner = auth()->check() 
+                        ? $restaurant->isOwner(auth()->user()) 
+                        : null;
+
         return view('restaurants.show', [
             'restaurant' => $restaurant,
             'isOwner' => $isOwner
@@ -67,6 +71,8 @@ class RestaurantController extends Controller
      */
     public function edit(Restaurant $restaurant)
     {
+        Gate::authorize('edit', $restaurant);
+
         return view('restaurants.edit', ['restaurant' => $restaurant]);
     }
 
@@ -75,13 +81,16 @@ class RestaurantController extends Controller
      */
     public function update(UpdateRestaurantRequest $request, Restaurant $restaurant)
     {
-        // 獲取經過驗證的數據
+        // 先驗證身分
+        Gate::authorize('update', $restaurant);
+
+        // 再驗證的數據
         $validatedData = $request->validated();
 
-        // 更新餐廳
+        // update to db
         $restaurant->update($validatedData);
 
-        // 返回重定向並帶有成功訊息
+        // redirect
         return redirect()->route('restaurants.index')->with('status', 'Restaurant updated successfully!');
     }
     /**
@@ -89,6 +98,8 @@ class RestaurantController extends Controller
      */
     public function destroy(Restaurant $restaurant)
     {
+        Gate::authorize('destroy', $restaurant);
+
         return redirect('restaurants.index');
     }
 }
