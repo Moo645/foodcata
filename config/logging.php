@@ -51,6 +51,12 @@ return [
     */
 
     'channels' => [
+        
+        'restaurant_jobs' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/restaurant_jobs.log'),
+            'level' => 'info',
+        ],
 
         'stack' => [
             'driver' => 'stack',
